@@ -14,15 +14,15 @@ router.get("/form", function (req, res, next) {
   }
 });
 
-var getAge = require("getage");
+var getAge = require("get-age");
 
 var nodemailer = require("nodemailer");
 var rand = Math.floor(Math.random() * 10000 + 54);
 var transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "rohankadam1602@gmail.com",
-    pass: "hdxayvfsrkeluwfy",
+    user: "election.blockchain@gmail.com",
+    pass: "ajkprvy7",
   },
 });
 
@@ -39,7 +39,6 @@ router.post("/registerdata", function (req, res) {
   data = req.body.aadharno; //data stores aadhar no
   console.log(data);
   account_address = req.body.account_address; //stores metamask acc address
-  console.log(account_address);
   //console.log(data);
   let sql = "SELECT * FROM registered_users WHERE Aadharno = ?";
   conn.query(sql, data, (error, results, fields) => {
@@ -47,14 +46,14 @@ router.post("/registerdata", function (req, res) {
       return console.error(error.message);
     }
     //console.log(results)
-    dob = results[0].dob;
+    dob = results[0].Dob;
     var email = results[0].Email;
     age = getAge(dob);
     is_registerd = results[0].Is_registered;
     if (is_registerd != "YES") {
       if (age >= 18) {
         var mailOptions = {
-          from: "rohankadam0148@gmail.com",
+          from: "rohankadam1602@gmail.com",
           to: email,
           subject: "Please confirm your Email account",
           text: "Hello, Your otp is " + rand,
@@ -87,17 +86,13 @@ router.post("/registerdata", function (req, res) {
 router.post("/otpverify", (req, res) => {
   var otp = req.body.otp;
   if (otp == rand) {
-    var record = {
-      Account_address: account_address,
-      Is_registered: "Yes",
-    };
+    var record = { Account_address: account_address, Is_registered: "Yes" };
     var sql = "INSERT INTO registered_users SET ?";
     conn.query(sql, record, function (err2, res2) {
       if (err2) {
         throw err2;
       } else {
-        var sql1 =
-          "Update registered_users set Is_registered=? Where Aadharno=?";
+        var sql1 = "Update registered_users set Is_registered=? Where Aadharno=?";
         var record1 = ["YES", data];
         console.log(data);
         conn.query(sql1, record1, function (err1, res1) {
@@ -123,13 +118,13 @@ router.post("/otpverify", (req, res) => {
 //     res.sendFile(__dirname+'/views/index.html')
 // });
 
-// app.get('/signin_signup',function(req,res){
-//     res.sendFile(__dirname+'/views/signup.html')
-// });
+/*app.get('/signin_signup',function(req,res){
+    res.sendFile(__dirname+'/views/signup.html')
+});
 
-// app.get('/signup',function(req,res){
-//     console.log(req.body);
-//     res.sendFile(__dirname+'/views/signup.html')
-// });
+app.get('/signup',function(req,res){
+    console.log(req.body);
+    res.sendFile(__dirname+'/views/signup.html')
+});*/
 
 module.exports = router;
